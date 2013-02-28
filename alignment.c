@@ -18,7 +18,7 @@
  */
 
 #include<stdio.h>
-#include<string.h>
+#include<ctype.h>
 
 
 #define ALIGNMENT_LENGTH 20
@@ -33,19 +33,22 @@ int main(){
 
 	char aligned_line[t];
 	char broken_word[ALIGNMENT_LENGTH];
-	int i=0 , j, space_count;
+	int i=0 , j, space_count=0, word_count;
 
 	char *word_pointers[ALIGNMENT_LENGTH];
 	 
-	while(1){
+//	while(1){
 		word_count=0;
 		for( ; i<t && ( *(aligned_line+i)=(char)fgetc(fp) ) != EOF ; i++ ){
+			printf("array , i : %c , %d ,(%d) \n", *(aligned_line+i) , i , isspace( (int)*(aligned_line+i) ) );
+
 			while(isspace( *(aligned_line+i) ) ){
 				/*word found, so put in array pointers */
 				*(aligned_line+i)='\0';
 				space_count++;	
 				i++;
-				(*aligned_line+i)=(char)fgetc(fp) ;
+				*(aligned_line+i)=(char)fgetc(fp) ;
+				printf("$$ array , i : %c , %d \n", *(aligned_line+i) , i );
 
 			}
 
@@ -57,30 +60,43 @@ int main(){
 		 * or something like that.
 		 *
 		 */
-		if( *(temp+1)==EOF ){
+
+		//printf("**%s,(%c), %d \n" , aligned_line, *temp , space_count );
+	//	*temp='\0';
+
+
+
+		/*now observe with what has the above array ended.
+		 * If it is a half-word, then store is somewhere.
+		 *
+		 */
+
+		if( *(temp)==EOF ){
 			*(temp+1)='\0';
 			printf("%s", aligned_line );
 
-			break ;
+			//break ;
 		}
 
-		else if( *temp==' ' || *temp=='\t' ){
-			broken_word[0]=*temp;
+		else if( isspace(*temp)  ){
+			//broken_word[0]=*temp;
+			space_count++;
 			*temp='\0';
 			i=0;
 		}
 		else{
-			for(i=0 ; !isspace(*temp) ; i++ ){
-				*(broken_word+i)=*temp;
-				temp--;
+			for(i=0 ; /*!isspace(*temp)*/ (*temp)!=' ' && (*temp)!='\t' ; i++ ){
+				printf("%c(%d)\n", *temp, isspace(*temp)  );
+				*(broken_word+i)=(*temp);
+				--temp;
 			}
 			*(temp+1)='\0' ;
 			--i;
 		}
 
-		printf("%s$$\n", aligned_line);
+		printf("%s$$, space : %d , broken_word: \n", aligned_line , space_count /*broken_word*/ );
 
-		/*now fill the aligned_line, by broken_word, but in reverse order */
+		/*now fill the aligned_line, by broken_word, but in reverse order 
 		int k=0;
 		while(i>-1){
 			*(aligned_line+k)=*(broken_word+i);
@@ -89,7 +105,11 @@ int main(){
 		}
 		i=k;
 
-	}
+		*/
+
+	//}
+	
+	  fclose(fp);
 
 return 0;
 
